@@ -74,7 +74,7 @@ public class Notation {
     }
 
     public static PieceType getPieceTypeFromLetter(char symbol) {
-        return switch (symbol) {
+        return switch (Character.toUpperCase(symbol)) {
             case 'P' -> PieceType.PAWN;
             case 'N' -> PieceType.KNIGHT;
             case 'B' -> PieceType.BISHOP;
