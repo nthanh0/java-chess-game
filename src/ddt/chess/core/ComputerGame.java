@@ -30,10 +30,7 @@ public class ComputerGame extends Game {
         if (bestMoveString.length() == 5) {
             PieceType promoteTo = Notation.getPieceTypeFromLetter(bestMoveString.charAt(4));
             getBoard().promotePawn(computerMove, promoteTo);
-<<<<<<< HEAD
             switchTurns();
-=======
->>>>>>> ba34ded1284ad0aca60705e735f11c78359416b9
         } else {
             makeMove(computerMove);
         }
