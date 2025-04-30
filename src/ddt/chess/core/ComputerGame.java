@@ -27,7 +27,12 @@ public class ComputerGame extends Game {
             bestMoveString = stockfish.getBestMove(Notation.gameToFEN(this), 3000);
         }
         Move computerMove = Notation.stockfishOutputToMove(getBoard(), bestMoveString);
-        makeMove(computerMove);
+        if (bestMoveString.length() == 5) {
+            PieceType promoteTo = Notation.getPieceTypeFromLetter(bestMoveString.charAt(4));
+            getBoard().promotePawn(computerMove, promoteTo);
+        } else {
+            makeMove(computerMove);
+        }
         return computerMove;
     }
 
