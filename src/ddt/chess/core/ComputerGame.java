@@ -24,10 +24,16 @@ public class ComputerGame extends Game {
         if (isTimedGame()) {
             bestMoveString = stockfish.getBestMoveWithTimeManagement(fen, getWhiteClock().getRemainingTimeMillis(), getBlackClock().getRemainingTimeMillis());
         } else {
-            bestMoveString = stockfish.getBestMove(Notation.gameToFEN(this), 3000);
+            bestMoveString = stockfish.getBestMove(Notation.gameToFEN(this), 500);
         }
         Move computerMove = Notation.stockfishOutputToMove(getBoard(), bestMoveString);
-        makeMove(computerMove);
+        if (bestMoveString.length() == 5) {
+            PieceType promoteTo = Notation.getPieceTypeFromLetter(bestMoveString.charAt(4));
+            getBoard().promotePawn(computerMove, promoteTo);
+            switchTurns();
+        } else {
+            makeMove(computerMove);
+        }
         return computerMove;
     }
 
