@@ -16,6 +16,7 @@ public class ChessGameGUI extends JFrame {
     public ChessGameGUI(boolean isComputerGame) {
         this.setResizable(false);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
         int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
 //        screenHeight = 2160;
         int squareSize = findClosest(new int[]{32, 64, 96, 128, 256, 512, 1024}, screenHeight / 12);
