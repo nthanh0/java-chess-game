@@ -1,8 +1,5 @@
 package ddt.chess.core;
-import ddt.chess.util.Notation;
 import ddt.chess.util.TimerClock;
-
-import java.util.Timer;
 
 public class Game {
     private final Board board;
@@ -12,6 +9,8 @@ public class Game {
     private TimerClock blackClock;
     private Thread whiteTimerThread;
     private Thread blackTimerThread;
+
+    private boolean clocksAreRunning = false;
 
     private PieceColor turn = PieceColor.WHITE;
     private int halfMoves = 0; // tracking for 50 move rule, draw if it reaches 100
@@ -98,7 +97,11 @@ public class Game {
             // add move to history
             history.addMove(board, move);
             // start/switch timers
-            if (isTimedGame()) {
+            if (isTimedGame() && history.getSize() >= 2) {
+                // only start the clocks if both sides have made a move
+                if (!clocksAreRunning) {
+                    clocksAreRunning = true;
+                }
                 switchClocks();
             }
             // update half move count, reset if moving piece is a pawn or a capture, else increment
@@ -263,5 +266,8 @@ public class Game {
         }
     }
 
+    public boolean clocksAreRunning() {
+        return clocksAreRunning;
+    }
 
 }
