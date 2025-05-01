@@ -100,13 +100,7 @@ public class Game {
             history.addMove(board, move);
             // start/switch timers
             if (isTimedGame()) {
-                if (turn == PieceColor.WHITE) {
-                    whiteClock.pause();
-                    blackClock.resume();
-                } else {
-                    blackClock.pause();
-                    whiteClock.resume();
-                }
+                switchClocks();
             }
             // update half move count, reset if moving piece is a pawn or a capture, else increment
             updateHalfMoves(move);
@@ -135,6 +129,16 @@ public class Game {
             }
             history.undoLastMove();
             restoreHalfMoves();
+        }
+    }
+
+    public void switchClocks() {
+        if (turn == PieceColor.WHITE) {
+            whiteClock.pause();
+            blackClock.resume();
+        } else {
+            blackClock.pause();
+            whiteClock.resume();
         }
     }
 
@@ -252,6 +256,7 @@ public class Game {
 
     public void restoreHalfMoves() {
         // expensive way of doing it but will improve later
+        halfMoves = 0;
         for (Move move : history.getHistory()) {
             updateHalfMoves(move);
         }
