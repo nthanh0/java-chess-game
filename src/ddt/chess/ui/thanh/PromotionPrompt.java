@@ -15,26 +15,26 @@ public class PromotionPrompt extends JDialog {
 
     int squareSize;
     PieceType result;
-    final Color defaultBackgroundColor = new Color(0, 0, 0, 50);
+    final Color defaultBackgroundColor = new Color(255, 255, 255, 125);
     int hoveredOption = -1;
 
-    public PromotionPrompt(ThemeLoader theme, PieceColor currentTurn, int squareSize) {
-        this.squareSize = squareSize;
+    public PromotionPrompt(BoardPanel boardPanel) {
+        this.squareSize = boardPanel.getSquareSize();
         this.setUndecorated(true);
         this.setFocusable(false);
         this.setBackground(defaultBackgroundColor);
         setLayout(new GridLayout(1, 4));
         JButton knightOption, bishopOption, rookOption, queenOption;
-        if (currentTurn == PieceColor.WHITE) {
-            knightOption = new JButton(new ImageIcon(theme.getWhiteKnightImage()));
-            bishopOption = new JButton(new ImageIcon(theme.getWhiteBishopImage()));
-            rookOption = new JButton(new ImageIcon(theme.getWhiteRookImage()));
-            queenOption = new JButton(new ImageIcon(theme.getWhiteQueenImage()));
+        if (boardPanel.getGame().getCurrentTurn() == PieceColor.WHITE) {
+            knightOption = new JButton(new ImageIcon(boardPanel.getThemeLoader().getWhiteKnightImage()));
+            bishopOption = new JButton(new ImageIcon(boardPanel.getThemeLoader().getWhiteBishopImage()));
+            rookOption = new JButton(new ImageIcon(boardPanel.getThemeLoader().getWhiteRookImage()));
+            queenOption = new JButton(new ImageIcon(boardPanel.getThemeLoader().getWhiteQueenImage()));
         } else {
-            knightOption = new JButton(new ImageIcon(theme.getBlackKnightImage()));
-            bishopOption = new JButton(new ImageIcon(theme.getBlackBishopImage()));
-            rookOption = new JButton(new ImageIcon(theme.getBlackRookImage()));
-            queenOption = new JButton(new ImageIcon(theme.getBlackQueenImage()));
+            knightOption = new JButton(new ImageIcon(boardPanel.getThemeLoader().getBlackKnightImage()));
+            bishopOption = new JButton(new ImageIcon(boardPanel.getThemeLoader().getBlackBishopImage()));
+            rookOption = new JButton(new ImageIcon(boardPanel.getThemeLoader().getBlackRookImage()));
+            queenOption = new JButton(new ImageIcon(boardPanel.getThemeLoader().getBlackQueenImage()));
         }
 
         knightOption.addActionListener(e -> {
@@ -64,14 +64,16 @@ public class PromotionPrompt extends JDialog {
         this.add(bishopOption);
         this.add(rookOption);
         this.add(queenOption);
-        this.setLocationRelativeTo(null);
+
+        this.setModal(true);
+        this.pack();
+        this.setLocationRelativeTo(boardPanel);
     }
 
     public void setupButton(JButton button, int optionIndex) {
-        button.setOpaque(true);
+        button.setOpaque(false);
         button.setFocusable(false);
         button.setBorder(null);
-        button.setRolloverEnabled(false);
         button.setBackground(defaultBackgroundColor);
         button.addMouseListener(new MouseAdapter() {
             @Override
@@ -93,7 +95,7 @@ public class PromotionPrompt extends JDialog {
     }
 
     public void drawHoverEffect(Graphics2D g2D) {
-        g2D.setColor(new Color(0, 0, 0, 100));
+        g2D.setColor(new Color(0, 0, 0, 50));
         g2D.fillRect(hoveredOption * squareSize, 0, squareSize, squareSize);
     }
 
