@@ -3,6 +3,8 @@ import ddt.chess.util.Notation;
 
 import java.util.ArrayList;
 
+import static ddt.chess.util.Notation.getPieceLetterFromPiece;
+
 public class MoveHistory {
     private final ArrayList<Move> history;
     private final ArrayList<String> historyString; // use letters to present pieces
@@ -57,6 +59,23 @@ public class MoveHistory {
         }
         return res.toString();
     }
+
+    // raw history string, not in algebraic notation but in stockfish-like style
+    // e.g. e2e4 e7e5 g1f3 b8c6
+    // used for saving and restoring games
+    public String getRawString() {
+        StringBuilder res = new StringBuilder();
+        for (Move move : history) {
+            res.append(Notation.squareToNotation(move.getFromSquare()));
+            res.append(Notation.squareToNotation(move.getToSquare()));
+            if (MoveValidator.isValidPromotion(move)) {
+                res.append(getPieceLetterFromPiece(move.getToSquare().getPiece()));
+            }
+            res.append(" ");
+        }
+        return res.toString();
+    }
+    
     public void resetHistory() {
         history.clear();
     }
