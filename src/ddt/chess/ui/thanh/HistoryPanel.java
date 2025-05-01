@@ -11,7 +11,9 @@ public class HistoryPanel extends JPanel {
     private Game game;
     private MoveHistory history;
     private JLabel label;
+    private int squareSize;
     public HistoryPanel(Game game, int squareSize) {
+        this.squareSize = squareSize;
         this.setPreferredSize(new Dimension(squareSize * 8, squareSize / 3));
         this.setLayout(new BorderLayout());
         this.game = game;
@@ -29,6 +31,14 @@ public class HistoryPanel extends JPanel {
 
     public void updateHistory() {
         label.setText(history.getUnicodeString());
+        revalidate();
+        repaint();
+    }
+
+    public void setSquareSize(int squareSize) {
+        this.squareSize = squareSize;
+        this.setPreferredSize(new Dimension(squareSize * 8, squareSize / 3));
+        label.setFont(new Font("Arial", Font.BOLD, squareSize / 5));
         revalidate();
         repaint();
     }
