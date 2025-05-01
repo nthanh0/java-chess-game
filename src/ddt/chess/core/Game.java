@@ -195,10 +195,12 @@ public class Game {
             if (blackClock.isFinished()) {
                 winner = "white";
                 gameOverCause = "time";
+                whiteTimerThread.interrupt();
                 return true;
             } else if (whiteClock.isFinished()) {
                 winner = "black";
                 gameOverCause = "time";
+                blackTimerThread.interrupt();
                 return true;
             }
         }
