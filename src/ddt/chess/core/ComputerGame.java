@@ -62,4 +62,5 @@ public class ComputerGame extends Game {
     public PieceColor getPlayerSide() {
         return playerSide;
     }
+
 }
