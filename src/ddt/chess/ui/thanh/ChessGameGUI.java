@@ -5,6 +5,8 @@ import ddt.chess.core.*;
 import javax.swing.*;
 import java.awt.*;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ChessGameGUI extends JFrame {
     private final Game game;
@@ -14,7 +16,6 @@ public class ChessGameGUI extends JFrame {
     public ChessGameGUI(boolean isComputerGame) {
         this.setResizable(false);
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
         int screenHeight = Toolkit.getDefaultToolkit().getScreenSize().height;
 //        screenHeight = 2160;
         int squareSize = findClosest(new int[]{32, 64, 96, 128, 256, 512, 1024}, screenHeight / 12);
@@ -23,11 +24,7 @@ public class ChessGameGUI extends JFrame {
             game = new ComputerGame(PieceColor.WHITE, 2000) {
                 @Override
                 public PieceType askForPromotion() {
-                    PromotionPrompt prompt = new PromotionPrompt(boardPanel.getThemeLoader(), getCurrentTurn(), squareSize);
-                    prompt.setSize(new Dimension(squareSize * 4, squareSize + squareSize / 2));
-                    prompt.setModal(true); // <- block until the user picks
-                    prompt.pack(); // adjust size
-                    prompt.setLocationRelativeTo(ChessGameGUI.this); // center over the main window
+                    PromotionPrompt prompt = new PromotionPrompt(boardPanel);
                     prompt.setVisible(true); // show dialog
                     return prompt.getResult();
                 }
@@ -36,11 +33,7 @@ public class ChessGameGUI extends JFrame {
             game = new Game() {
                 @Override
                 public PieceType askForPromotion() {
-                    PromotionPrompt prompt = new PromotionPrompt(boardPanel.getThemeLoader(), getCurrentTurn(), squareSize);
-                    prompt.setSize(new Dimension(squareSize * 4, squareSize + squareSize / 2));
-                    prompt.setModal(true); // <- block until the user picks
-                    prompt.pack(); // adjust size
-                    prompt.setLocationRelativeTo(ChessGameGUI.this); // center over the main window
+                    PromotionPrompt prompt = new PromotionPrompt(boardPanel);
                     prompt.setVisible(true); // show dialog
                     return prompt.getResult();
                 }
@@ -69,6 +62,7 @@ public class ChessGameGUI extends JFrame {
     }
 
     public void setSquareSize() { }
+
 }
 
 

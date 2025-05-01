@@ -236,11 +236,20 @@ public class BoardPanel extends JPanel implements MouseListener {
 
     public void setSquareSize(int squareSize) {
         this.squareSize = squareSize;
+        this.setPreferredSize(new Dimension(squareSize * 8, squareSize * 8));
         theme.setSquareSize(squareSize);
         repaint();
     }
 
     public ThemeLoader getThemeLoader() {
         return theme;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public int getSquareSize() {
+        return squareSize;
     }
 }
