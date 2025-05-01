@@ -69,8 +69,6 @@ public class ChessGameGUI extends JFrame {
     }
 
     public void setSquareSize() { }
-
-    public void setPieceTheme() { }
 }
 
 
