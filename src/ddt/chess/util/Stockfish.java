@@ -218,7 +218,7 @@ public class Stockfish {
      * @return True if successful
      */
     public boolean setEloLevel(int elo) {
-        if (elo < 1350 || elo > 2850) {
+        if (elo < 1320 || elo > 3190) {
             System.out.println("Elo must be between 1350 and 2850.");
             return false;
         }
