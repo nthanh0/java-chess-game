@@ -7,11 +7,9 @@ import java.util.Timer;
 public class Game {
     private final Board board;
     private final MoveHistory history;
+
     private TimerClock whiteClock;
     private TimerClock blackClock;
-
-    boolean timersStarted = false;
-
     private Thread whiteTimerThread;
     private Thread blackTimerThread;
 
@@ -47,6 +45,7 @@ public class Game {
         board = new Board();
         board.setupPieces();
         history = new MoveHistory();
+
         this.whiteClock = new TimerClock(time);
         whiteTimerThread = new Thread(whiteClock);
         this.blackClock = new TimerClock(time);
