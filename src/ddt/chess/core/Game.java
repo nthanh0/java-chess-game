@@ -9,6 +9,12 @@ public class Game {
     private final MoveHistory history;
     private TimerClock whiteClock;
     private TimerClock blackClock;
+
+    boolean timersStarted = false;
+
+    private Thread whiteTimerThread;
+    private Thread blackTimerThread;
+
     private PieceColor turn = PieceColor.WHITE;
     private int halfMoves = 0; // tracking for 50 move rule, draw if it reaches 100
 
@@ -27,7 +33,14 @@ public class Game {
         board.setupPieces();
         history = new MoveHistory();
         this.whiteClock = new TimerClock(whiteTime);
+        whiteTimerThread = new Thread(whiteClock);
         this.blackClock = new TimerClock(blackTime);
+        blackTimerThread = new Thread(blackClock);
+
+        whiteTimerThread.start();
+        whiteClock.pause();
+        blackTimerThread.start();
+        blackClock.pause();
     }
 
     public Game(String time) {
@@ -35,53 +48,15 @@ public class Game {
         board.setupPieces();
         history = new MoveHistory();
         this.whiteClock = new TimerClock(time);
+        whiteTimerThread = new Thread(whiteClock);
         this.blackClock = new TimerClock(time);
-    }
+        blackTimerThread = new Thread(blackClock);
 
-    // not done implementing
-//    public Game(String FEN) {
-//        String[] parts = FEN.split("\\s");
-//        board = new Board();
-//        history = new MoveHistory();
-//        int x = 0, y = 0;
-//
-//        // placement
-//        int i;
-//        for (i = 0; i < parts[0].length(); i++) {
-//            char c = FEN.charAt(i);
-//            if (c == ' ') {
-//                break;
-//            }
-//            if (Character.isLetter(c)) {
-//                board.getSquare(x, y).setPiece(Notation.getPieceFromLetter(c));
-//                y++;
-//            } else if (Character.isDigit(c)) {
-//                y += (c - '0') + 1;
-//            }
-//            if (c == '\\') {
-//                x++;
-//                y = 0;
-//            }
-//        }
-//
-//        // turn
-//        if (parts[1].equals("b")) {
-//            switchTurns();
-//        }
-//
-//        // castling rights
-//        if (!parts[2].equals("-")) {
-//
-//        }
-//        // possible en passant capture square
-//        if (!parts[3].equals("-")) {
-//            Piece movingPiece;
-//
-//            if (parts[3].charAt(2) == '3') {
-//
-//            }
-//        }
-//    }
+        whiteTimerThread.start();
+        whiteClock.pause();
+        blackTimerThread.start();
+        blackClock.pause();
+    }
 
     public boolean makeMove(Move move) {
         // check if piece color aligns with turn
@@ -123,6 +98,16 @@ public class Game {
             }
             // add move to history
             history.addMove(board, move);
+            // start/switch timers
+            if (isTimedGame()) {
+                if (turn == PieceColor.WHITE) {
+                    whiteClock.pause();
+                    blackClock.resume();
+                } else {
+                    blackClock.pause();
+                    whiteClock.resume();
+                }
+            }
             // update half move count, reset if moving piece is a pawn or a capture, else increment
             updateHalfMoves(move);
             // switch turns
