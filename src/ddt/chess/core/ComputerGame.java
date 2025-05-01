@@ -17,6 +17,7 @@ public class ComputerGame extends Game {
         stockfish.setEloLevel(computerElo);
     }
 
+    // time format is hh:mm:ss
     public ComputerGame(PieceColor playerSide, String time, int computerElo) {
         super(time);
         this.playerSide = playerSide;
