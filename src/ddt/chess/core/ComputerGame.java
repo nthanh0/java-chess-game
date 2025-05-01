@@ -17,6 +17,14 @@ public class ComputerGame extends Game {
         stockfish.setEloLevel(computerElo);
     }
 
+    public ComputerGame(PieceColor playerSide, String time, int computerElo) {
+        super(time);
+        this.playerSide = playerSide;
+        stockfish = new Stockfish();
+        stockfish.startEngine(stockfishPath);
+        stockfish.setEloLevel(computerElo);
+    }
+
     public Move executeComputerMove() {
         int waitTime;
         String fen = Notation.gameToFEN(this);
@@ -24,12 +32,14 @@ public class ComputerGame extends Game {
         if (isTimedGame()) {
             bestMoveString = stockfish.getBestMoveWithTimeManagement(fen, getWhiteClock().getRemainingTimeMillis(), getBlackClock().getRemainingTimeMillis());
         } else {
-            bestMoveString = stockfish.getBestMove(Notation.gameToFEN(this), 500);
+            bestMoveString = stockfish.getBestMove(Notation.gameToFEN(this), 3000);
         }
         Move computerMove = Notation.stockfishOutputToMove(getBoard(), bestMoveString);
         if (bestMoveString.length() == 5) {
             PieceType promoteTo = Notation.getPieceTypeFromLetter(bestMoveString.charAt(4));
             getBoard().promotePawn(computerMove, promoteTo);
+            getHistory().addMove(getBoard(), computerMove);
+            updateHalfMoves(computerMove);
             switchTurns();
         } else {
             makeMove(computerMove);
