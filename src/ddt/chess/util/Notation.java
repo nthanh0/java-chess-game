@@ -34,6 +34,7 @@ public class Notation {
         return res;
     }
 
+    // case-sensitive, uppercase for white, lowercase for black
     public static Piece getPieceFromLetter(char letter) {
         PieceType type = getPieceTypeFromLetter(Character.toUpperCase(letter));
         PieceColor color = (Character.isUpperCase(letter)) ? PieceColor.WHITE : PieceColor.BLACK;
@@ -279,9 +280,12 @@ public class Notation {
         return res;
     }
 
+    // used for both game restore and stockfish
     public static Move stockfishOutputToMove(Board board, String moveString) {
         return new Move(Notation.getSquareFromNotation(board, moveString.substring(0, 2)),
                         Notation.getSquareFromNotation(board, moveString.substring(2)));
     }
+
+
 
 }
