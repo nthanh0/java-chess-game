@@ -66,15 +66,15 @@ public class TimerClock implements Runnable {
 
     public String getTimeLeftString() {
         int millis = Math.max(0, remainingTimeMillis);
-        int totalSeconds = millis / 1000;
-        int hours = totalSeconds / 3600;
-        int minutes = (totalSeconds % 3600) / 60;
-        int seconds = totalSeconds % 60;
+        int remainingTimeSeconds = millis / 1000;
+        int hours = remainingTimeSeconds / 3600;
+        int minutes = (remainingTimeSeconds % 3600) / 60;
+        int seconds = remainingTimeSeconds % 60;
         int tenths = (millis % 1000) / 100;
 
         if (hours > 0) {
             return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-        } else if (seconds < 10) {
+        } else if (remainingTimeSeconds < 10) {
             return String.format("00:%02d.%d", seconds, tenths);
         } else {
             return String.format("%02d:%02d", minutes, seconds);
