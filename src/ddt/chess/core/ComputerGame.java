@@ -40,6 +40,9 @@ public class ComputerGame extends Game {
             PieceType promoteTo = Notation.getPieceTypeFromLetter(bestMoveString.charAt(4));
             getBoard().promotePawn(computerMove, promoteTo);
             getHistory().addMove(getBoard(), computerMove);
+            if (isTimedGame()) {
+                switchClocks();
+            }
             updateHalfMoves(computerMove);
             switchTurns();
         } else {
