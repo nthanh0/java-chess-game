@@ -170,6 +170,7 @@ public class SettingsPanel extends JPanel {
             dialog = new JDialog(parent, title, Dialog.ModalityType.APPLICATION_MODAL);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.setLayout(new BorderLayout());
+            dialog.setResizable(false);
 
             JPanel gridPanel = createThumbnailGrid();
             JScrollPane scrollPane = new JScrollPane(gridPanel);
@@ -186,7 +187,7 @@ public class SettingsPanel extends JPanel {
 
             // Remove the cancel button panel entirely
 
-            int width = COLUMNS * (squareSize + 20) + 50;
+            int width = COLUMNS * squareSize + squareSize;
             int height = Math.min(400, (int) Math.ceil(themes.length / (double) COLUMNS) * (squareSize + 20));
             dialog.setSize(new Dimension(width, height));
             dialog.setLocationRelativeTo(parent);
@@ -194,9 +195,8 @@ public class SettingsPanel extends JPanel {
 
         private JPanel createThumbnailGrid() {
             JPanel gridPanel = new JPanel();
-            gridPanel.setLayout(new GridLayout(0, COLUMNS, 10, 10));
-            gridPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
+            gridPanel.setLayout(new GridLayout(0, COLUMNS, squareSize / 8, squareSize / 8));
+            gridPanel.setBorder(new EmptyBorder(squareSize / 6, squareSize / 6, squareSize / 6, squareSize / 6));
             for (String theme : themes) {
                 JPanel thumbnailPanel = createThumbnailPanel(theme);
                 gridPanel.add(thumbnailPanel);
@@ -216,12 +216,12 @@ public class SettingsPanel extends JPanel {
                 // Use EmptyBorder inside LineBorder to ensure no gap
                 if (theme.equals(currentTheme)) {
                     panel.setBorder(BorderFactory.createCompoundBorder(
-                            new LineBorder(selectedBorderColor, 3),
+                            new LineBorder(selectedBorderColor, 5),
                             new EmptyBorder(0, 0, 0, 0)));
                     selectedTheme = theme; // Track selected theme from beginning
                 } else {
                     panel.setBorder(BorderFactory.createCompoundBorder(
-                            new LineBorder(menuBackGroundColor, 3),
+                            new LineBorder(menuBackGroundColor, 5),
                             new EmptyBorder(0, 0, 0, 0)));
                 }
             } else {
@@ -322,7 +322,7 @@ public class SettingsPanel extends JPanel {
                             if (themeType == ThemeType.BOARD) {
                                 // For board themes: use border with compound border to prevent gaps
                                 pnl.setBorder(BorderFactory.createCompoundBorder(
-                                        new LineBorder(menuBackGroundColor, 3),
+                                        new LineBorder(menuBackGroundColor, 5),
                                         new EmptyBorder(0, 0, 0, 0)));
                             } else {
                                 // For piece themes: use background

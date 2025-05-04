@@ -182,21 +182,12 @@ public class Notation {
 
     public static String moveToUnicodeAlgebraicNotation(Board board, Move move) {
         String res = moveToAlgebraicNotation(board, move);
-        if (move.getMovingPiece().getColor() == PieceColor.WHITE) {
-            res = res
-                .replace("K", "♔")
-                .replace("Q", "♕")
-                .replace("R", "♖")
-                .replace("B", "♗")
-                .replace("N", "♘");
-        } else {
-            res = res
-                .replace("K", "♚")
-                .replace("Q", "♛")
-                .replace("R", "♜")
-                .replace("B", "♝")
-                .replace("N", "♞");
-        }
+        res = res
+            .replace("K", "♔")
+            .replace("Q", "♕")
+            .replace("R", "♖")
+            .replace("B", "♗")
+            .replace("N", "♘");
         return res;
     }
 
