@@ -5,9 +5,6 @@ import ddt.chess.util.SoundPlayer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ChessGameGUI extends JFrame {
     private final Game game;
@@ -68,20 +65,28 @@ public class ChessGameGUI extends JFrame {
         soundPlayer = new SoundPlayer();
 
         game.setOnMoveMade(() -> {
-            boardPanel.repaint();
+            if (game instanceof ComputerGame computerGame
+                && computerGame.getCurrentTurn() == computerGame.getPlayerSide()) {
+                boardPanel.resetHighlights();
+                boardPanel.repaint();
+            }
             sidePanel.getBlackInfoPanel().updateComputerThinking();
+            sidePanel.getHistoryScrollPane().refresh();
             soundPlayer.playMoveSound(game);
         });
 
-        game.getHistory().setOnUpdate(() -> {
+        game.getHistory().setOnUndo(() -> {
             boardPanel.resetHighlights();
             boardPanel.repaint();
+            sidePanel.getBlackInfoPanel().updateComputerThinking();
             sidePanel.getHistoryScrollPane().refresh();
         });
 
         game.setOnGameEnd(() -> {
             sidePanel.hideGameControlPanel();
             sidePanel.getGameOverPanel().update();
+            boardPanel.clearMoveHints();
+            boardPanel.repaint();
             soundPlayer.playGameEndSound();
         });
 

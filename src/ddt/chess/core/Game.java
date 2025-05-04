@@ -172,11 +172,11 @@ public class Game {
 
     public void switchClocks() {
         if (turn == PieceColor.WHITE) {
-            whiteClock.pause();
-            blackClock.resume();
-        } else {
-            blackClock.pause();
             whiteClock.resume();
+            blackClock.pause();
+        } else {
+            blackClock.resume();
+            whiteClock.pause();
         }
     }
 
@@ -320,8 +320,8 @@ public class Game {
         }
     }
 
-    public void resign() {
-        winner = (getCurrentTurn() == PieceColor.WHITE) ? "black" : "white";
+    public void resign(PieceColor side) {
+        winner = (side == PieceColor.WHITE) ? "black" : "white";
         gameOverCause = "resign";
         endGame();
     }

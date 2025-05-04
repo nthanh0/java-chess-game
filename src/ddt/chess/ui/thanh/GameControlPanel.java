@@ -51,12 +51,10 @@ public class GameControlPanel extends JPanel {
         resignButton.addActionListener(e -> {
             if (game instanceof ComputerGame computerGame) {
                 if (computerGame.getCurrentTurn() == computerGame.getComputerSide()) {
-                    return;
-                } else {
-                    game.resign();
+                    game.resign(computerGame.getPlayerSide());
                 }
             } else {
-                game.resign();
+                game.resign(game.getCurrentTurn());
             }
         });
         setupButton(resignButton);

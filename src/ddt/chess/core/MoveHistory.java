@@ -10,7 +10,7 @@ public class MoveHistory {
     private final ArrayList<String> historyString; // use letters to present pieces
     private final ArrayList<String> unicodeHistoryString; // use Unicode symbols to present pieces
 
-    private Runnable onUpdate;
+    private Runnable onUndo;
 
     public MoveHistory() {
         history = new ArrayList<>();
@@ -29,9 +29,6 @@ public class MoveHistory {
         }
         historyString.add(index + Notation.moveToAlgebraicNotation(board, move) + ' ');
         unicodeHistoryString.add(index + Notation.moveToUnicodeAlgebraicNotation(board, move) + ' ');
-        if (onUpdate != null) {
-            onUpdate.run();
-        }
     }
 
     public void undoLastMove() {
@@ -40,8 +37,8 @@ public class MoveHistory {
             historyString.removeLast();
             unicodeHistoryString.removeLast();
         }
-        if (onUpdate != null) {
-            onUpdate.run();
+        if (onUndo != null) {
+            onUndo.run();
         }
     }
 
@@ -96,7 +93,7 @@ public class MoveHistory {
         return history;
     }
 
-    public void setOnUpdate(Runnable onUpdate) {
-        this.onUpdate = onUpdate;
+    public void setOnUndo(Runnable onUndo) {
+        this.onUndo = onUndo;
     }
 }

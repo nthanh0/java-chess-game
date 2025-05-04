@@ -71,6 +71,10 @@ public class ComputerGame extends Game {
             System.out.print("NOT COMPUTER'S TURN");
             return null;
         }
+
+        if (isOver()) {
+            return null;
+        }
         if (bestMoveString.length() == 5) {
             PieceType promoteTo = Notation.getPieceTypeFromLetter(bestMoveString.charAt(4));
             getBoard().promotePawn(computerMove, promoteTo);

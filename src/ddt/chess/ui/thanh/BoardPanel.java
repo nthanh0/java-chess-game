@@ -118,14 +118,6 @@ public class BoardPanel extends JPanel implements MouseListener {
                         computerGame.cancelCalculation();
                         new Thread(() -> {
                             Move computerMove = computerGame.executeComputerMove();
-                            if (computerMove != null) {
-                                SwingUtilities.invokeLater(() -> {
-                                    clearHighlights();
-                                    highlightSquare(computerMove.getFromSquare());
-                                    highlightSquare(computerMove.getToSquare());
-                                    repaint();
-                                });
-                            }
                         }).start();
                     }
                 } else {
