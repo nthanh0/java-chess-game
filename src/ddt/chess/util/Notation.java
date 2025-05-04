@@ -92,59 +92,81 @@ public class Notation {
         boolean isPawn = move.getMovingPiece().getType() == PieceType.PAWN;
         int fromSquareX = move.getFromSquare().getX();
         int fromSquareY = move.getFromSquare().getY();
+
         // castling
         if (move.getMoveType() == MoveType.CASTLING) {
             return (fromSquareY < move.getToSquare().getY()) ? "O-O" : "O-O-O";
         }
+
         if (!isPawn) {
             res.append(Character.toUpperCase(move.getMovingPiece().getType().getPieceLetter()));
         }
+
         if (isPawn) {
             // pawns only and always have to specify the file when capturing
-            // so no checking is needed
             if (move.isCapture() || MoveValidator.isValidEnPassantPattern(move)) {
                 res.append(Notation.squareToNotation(move.getFromSquare()).charAt(0));
             }
         } else {
+            // disambiguation
+            boolean needFile = false;
+            boolean needRank = false;
+
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
                     if (i == fromSquareX && j == fromSquareY) {
                         continue;
                     }
+
                     Square otherSquare = board.getSquare(i, j);
                     Piece otherPiece = otherSquare.getPiece();
                     Move otherMove = new Move(otherSquare, move.getToSquare());
+
                     if (otherPiece != null
                             && otherPiece.getColor() == move.getMovingPiece().getColor()
-                            && otherPiece.getType() == move.getMovingPiece().getType()) {
-                        if (MoveValidator.isValidNormalMove(board, otherMove)) {
-                            if (otherSquare.getX() == fromSquareX) {
-                                // if there is another piece of the same type in the same rank
-                                // then specify the file
-                                res.append(Notation.squareToNotation(move.getFromSquare()).charAt(0));
-                            }
-                            if (otherSquare.getY() == fromSquareY) {
-                                // if there is another piece of the same type in the same file
-                                // then specify the rank
-                                res.append(Notation.squareToNotation(move.getFromSquare()).charAt(1));
-                            }
-                            // if neither but the other piece can still move to that same square
-                            // then specify the rank
-                            res.append(Notation.squareToNotation(move.getFromSquare()).charAt(0));
+                            && otherPiece.getType() == move.getMovingPiece().getType()
+                            && MoveValidator.isValidNormalMove(board, otherMove)) {
+
+                        // specify file if same rank
+                        if (otherSquare.getX() == fromSquareX) {
+                            needFile = true;
+                        }
+
+                        if (otherSquare.getY() == fromSquareY) {
+                            // same file, need rank to disambiguate
+                            needRank = true;
+                        }
+
+                        if (otherSquare.getX() != fromSquareX && otherSquare.getY() != fromSquareY) {
+                            // different file and rank, prefer file disambiguation by default
+                            needFile = true;
                         }
                     }
                 }
             }
+
+            // Add disambiguation information as needed
+            if (needFile) {
+                res.append(Notation.squareToNotation(move.getFromSquare()).charAt(0));
+            }
+
+            if (needRank) {
+                res.append(Notation.squareToNotation(move.getFromSquare()).charAt(1));
+            }
         }
+
         if (move.isCapture() || MoveValidator.isValidEnPassantPattern(move)) {
             res.append('x');
         }
+
         res.append(Notation.squareToNotation(move.getToSquare()));
+
         // check for promotion
         if (MoveValidator.isValidPromotion(move)) {
             char promotedToPieceLetter = move.getToSquare().getPiece().getType().getPieceLetter();
             res.append('=').append(Character.toUpperCase(promotedToPieceLetter));
         }
+
         // check
         PieceColor opponentSide = (move.getMovingPiece().isWhite()) ? PieceColor.BLACK : PieceColor.WHITE;
         if (board.isCheck(opponentSide)) {
@@ -154,76 +176,28 @@ public class Notation {
                 res.append('+');
             }
         }
+
         return res.toString();
     }
 
     public static String moveToUnicodeAlgebraicNotation(Board board, Move move) {
-        StringBuilder res = new StringBuilder();
-        boolean isPawn = move.getMovingPiece().getType() == PieceType.PAWN;
-        int fromSquareX = move.getFromSquare().getX();
-        int fromSquareY = move.getFromSquare().getY();
-        // castling
-        if (move.getMoveType() == MoveType.CASTLING) {
-            return (fromSquareY < move.getToSquare().getY()) ? "O-O" : "O-O-O";
-        }
-        if (!isPawn) {
-            res.append(getUnicodePieceSymbolFromType(move.getMovingPiece().getType()));
-        }
-        if (isPawn) {
-            // pawns only and always have to specify the file when capturing
-            // so no checking is needed
-            if (move.isCapture() || MoveValidator.isValidEnPassantPattern(move)) {
-                res.append(Notation.squareToNotation(move.getFromSquare()).charAt(0));
-            }
+        String res = moveToAlgebraicNotation(board, move);
+        if (move.getMovingPiece().getColor() == PieceColor.WHITE) {
+            res = res
+                .replace("K", "♔")
+                .replace("Q", "♕")
+                .replace("R", "♖")
+                .replace("B", "♗")
+                .replace("N", "♘");
         } else {
-            for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 8; j++) {
-                    if (i == fromSquareX && j == fromSquareY) {
-                        continue;
-                    }
-                    Square otherSquare = board.getSquare(i, j);
-                    Piece otherPiece = otherSquare.getPiece();
-                    Move otherMove = new Move(otherSquare, move.getToSquare());
-                    if (otherPiece != null
-                            && otherPiece.getColor() == move.getMovingPiece().getColor()
-                            && otherPiece.getType() == move.getMovingPiece().getType()) {
-                        if (MoveValidator.isValidNormalMove(board, otherMove)) {
-                            if (otherSquare.getX() == fromSquareX) {
-                                // if there is another piece of the same type in the same rank
-                                // then specify the file
-                                res.append(Notation.squareToNotation(move.getFromSquare()).charAt(0));
-                            }
-                            if (otherSquare.getY() == fromSquareY) {
-                                // if there is another piece of the same type in the same file
-                                // then specify the rank
-                                res.append(Notation.squareToNotation(move.getFromSquare()).charAt(1));
-                            }
-                            // if neither but the other piece can still move to that same square
-                            // then specify the rank
-                            res.append(Notation.squareToNotation(move.getFromSquare()).charAt(0));
-                        }
-                    }
-                }
-            }
+            res = res
+                .replace("K", "♚")
+                .replace("Q", "♛")
+                .replace("R", "♜")
+                .replace("B", "♝")
+                .replace("N", "♞");
         }
-        if (move.isCapture() || MoveValidator.isValidEnPassantPattern(move)) {
-            res.append('x');
-        }
-        res.append(Notation.squareToNotation(move.getToSquare()));
-        // check for promotion
-        if (MoveValidator.isValidPromotion(move)) {
-            char promotedToPieceLetter = move.getToSquare().getPiece().getType().getPieceLetter();
-            res.append('=').append(Character.toUpperCase(promotedToPieceLetter));
-        }
-        PieceColor opponentSide = (move.getMovingPiece().isWhite()) ? PieceColor.BLACK : PieceColor.WHITE;
-        if (board.isCheck(opponentSide)) {
-            if (board.generateAllValidNormalMoves(opponentSide).isEmpty()) {
-                res.append('#');
-            } else {
-                res.append('+');
-            }
-        }
-        return res.toString();
+        return res;
     }
 
     public static String gameToFEN(Game game) {

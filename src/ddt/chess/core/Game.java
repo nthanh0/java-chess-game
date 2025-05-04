@@ -134,6 +134,7 @@ public class Game {
             }
             case PROMOTION -> {
                 PieceType promoteTo = askForPromotion();
+                board.promotePawn(move, promoteTo);
                 if (promoteTo == null) {
                     return false;
                 }

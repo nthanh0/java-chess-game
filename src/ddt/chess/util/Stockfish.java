@@ -12,7 +12,7 @@ public class Stockfish {
     private boolean isReady = false;
     private Map<String, String> positionCache = new HashMap<>();
     private boolean useHash = true;
-    private int hashSizeMB = 1024; // Default hash size
+    private int hashSizeMB = 256; // Default hash size
     private int elo = 1320;
     private int threads = Runtime.getRuntime().availableProcessors(); // Use all available cores by default
 
