@@ -7,27 +7,33 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ThemeLoader {
     String boardTheme, pieceTheme;
     int squareSize;
-    
+
     BufferedImage boardImage;
-    
+
     BufferedImage whitePawnImage;
     BufferedImage whiteKnightImage;
     BufferedImage whiteBishopImage;
     BufferedImage whiteRookImage;
     BufferedImage whiteQueenImage;
     BufferedImage whiteKingImage;
-    
+
     BufferedImage blackPawnImage;
     BufferedImage blackKnightImage;
     BufferedImage blackBishopImage;
     BufferedImage blackRookImage;
     BufferedImage blackQueenImage;
     BufferedImage blackKingImage;
-    
+
+    // Cache for theme preview images
+    private final Map<String, Map<String, Image>> pieceThemeCache = new HashMap<>();
+    private final Map<String, Image> boardThemeCache = new HashMap<>();
+
     public ThemeLoader(String boardTheme, String pieceTheme, int squareSize) {
         this.boardTheme = boardTheme;
         this.pieceTheme = pieceTheme;
@@ -68,6 +74,85 @@ public class ThemeLoader {
             throw new RuntimeException();
         }
     }
+
+    public Image getPieceImage(String themeName, String pieceCode) {
+        // Check cache first
+        if (pieceThemeCache.containsKey(themeName) &&
+                pieceThemeCache.get(themeName).containsKey(pieceCode)) {
+            return pieceThemeCache.get(themeName).get(pieceCode);
+        }
+
+        // Load the image
+        try {
+            // Use a smaller preview size for thumbnails in the dialog
+            int previewSize = Math.min(squareSize, 64);
+            String imagePath = String.format("resources/piece/%s/%dx%d/%s.png",
+                    themeName, previewSize, previewSize, pieceCode);
+
+            Image image = ImageIO.read(new File(imagePath));
+
+            // Cache the image
+            pieceThemeCache.computeIfAbsent(themeName, k -> new HashMap<>())
+                    .put(pieceCode, image);
+
+            return image;
+        } catch (IOException e) {
+            // Return null if image couldn't be loaded
+            return null;
+        }
+    }
+
+
+    public Image getBoardThumbnail(String themeName) {
+        // Check cache
+        if (boardThemeCache.containsKey(themeName)) {
+            return boardThemeCache.get(themeName);
+        }
+
+        // 1. Try to load the existing thumbnail image first
+        try {
+            String thumbnailPath = String.format("resources/board/%s/%s.thumbnail.png", themeName, themeName);
+            Image thumbnailImage = ImageIO.read(new File(thumbnailPath));
+            boardThemeCache.put(themeName, thumbnailImage);
+            return thumbnailImage;
+        } catch (IOException ignored) {
+            // Continue to fallback
+        }
+
+        // 2. Fallback: try loading the full board and cropping it
+        try {
+            String imagePath = String.format("resources/board/%s/%s.png", themeName, themeName);
+            BufferedImage originalImage = ImageIO.read(new File(imagePath));
+            int thumbnailSize = Math.min(originalImage.getWidth(), originalImage.getHeight()) / 4;
+            BufferedImage thumbnail = originalImage.getSubimage(0, 0, thumbnailSize, thumbnailSize);
+            boardThemeCache.put(themeName, thumbnail);
+            return thumbnail;
+        } catch (IOException ignored) {
+            // Continue to final fallback
+        }
+
+        // 3. Final fallback: placeholder
+        int hash = themeName.hashCode();
+        Color color = new Color(
+                Math.abs(hash) % 200 + 55,
+                Math.abs(hash >> 8) % 200 + 55,
+                Math.abs(hash >> 16) % 200 + 55
+        );
+        int tileSize = 8, gridSize = 4;
+        BufferedImage placeholder = new BufferedImage(tileSize * gridSize, tileSize * gridSize, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = placeholder.createGraphics();
+        Color dark = color.darker(), light = color.brighter();
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                g.setColor((i + j) % 2 == 0 ? light : dark);
+                g.fillRect(i * tileSize, j * tileSize, tileSize, tileSize);
+            }
+        }
+        g.dispose();
+        boardThemeCache.put(themeName, placeholder);
+        return placeholder;
+    }
+
 
     public void setSquareSize(int squareSize) {
         this.squareSize = squareSize;
@@ -135,9 +220,9 @@ public class ThemeLoader {
     public BufferedImage getBlackKingImage() {
         return blackKingImage;
     }
-    
+
     public BufferedImage getImageOfPiece(Piece piece) {
-        if (piece.isWhite()) {
+        if (piece != null && piece.isWhite()) {
             switch (piece.getType()) {
                 case KNIGHT -> {
                     return whiteKnightImage;
@@ -182,5 +267,12 @@ public class ThemeLoader {
         }
         return null;
     }
-    
+
+    public String getBoardTheme() {
+        return boardTheme;
+    }
+
+    public String getPieceTheme() {
+        return pieceTheme;
+    }
 }

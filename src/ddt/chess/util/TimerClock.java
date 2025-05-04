@@ -2,6 +2,7 @@ package ddt.chess.util;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Timer;
 
 public class TimerClock implements Runnable {
     private int remainingTimeMillis;
@@ -17,6 +18,10 @@ public class TimerClock implements Runnable {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         LocalTime time = LocalTime.parse(timerTime, formatter);
         this.remainingTimeMillis = time.toSecondOfDay() * 1000;
+    }
+
+    public TimerClock(double timerTimeMinutes) {
+        this.remainingTimeMillis = (int)(timerTimeMinutes * 60 * 1000);
     }
 
     public void pause() {
@@ -86,4 +91,8 @@ public class TimerClock implements Runnable {
         remainingTimeMillis += seconds * 1000;
     }
     public void addTimeMillis(int milliseconds) { remainingTimeMillis += milliseconds; }
+
+    public boolean isPaused() {
+        return isPaused;
+    }
 }

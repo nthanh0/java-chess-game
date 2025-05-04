@@ -14,7 +14,6 @@ import java.util.Map;
 public class BoardPanel extends JPanel implements MouseListener {
     private final Game game;
     private final Board board;
-    private final HistoryPanel historyPanel;
     private int squareSize;
 
     private String boardTheme = "brown";
@@ -25,7 +24,7 @@ public class BoardPanel extends JPanel implements MouseListener {
     private final ArrayList<Square> validToSquares = new ArrayList<>();
     private final Map<Square, Color> highlightedSquares = new HashMap<>();
     private Square toSquare;
-
+    
 //    public BoardPanel(int SQUARE_SIZE, String boardTheme, String pieceTheme) {
 //        this.SQUARE_SIZE = SQUARE_SIZE;
 //        this.BOARD_SIZE = SQUARE_SIZE * 8
@@ -34,10 +33,9 @@ public class BoardPanel extends JPanel implements MouseListener {
 //        this.addMouseListener(this);
 //        this.setPreferredSize(new Dimension(BOARD_SIZE, BOARD_SIZE));
 //    }
-    public BoardPanel(Game game, HistoryPanel historyPanel, int squareSize) {
+    public BoardPanel(Game game, int squareSize) {
         theme = new ThemeLoader(boardTheme, pieceTheme, squareSize);
         this.game = game;
-        this.historyPanel = historyPanel;
         board = game.getBoard();
         board.setupPieces();
         this.squareSize = squareSize;
@@ -51,7 +49,7 @@ public class BoardPanel extends JPanel implements MouseListener {
         repaint();
     }
 
-    public void setBoardTheme(String boardTheme) {
+        public void setBoardTheme(String boardTheme) {
         this.boardTheme = boardTheme;
         theme.setBoardTheme(boardTheme);
         repaint();
@@ -63,6 +61,16 @@ public class BoardPanel extends JPanel implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
+        if (game.isOver()) {
+            return;
+        }
+
+        if (game instanceof ComputerGame computerGame) {
+            if (computerGame.getCurrentTurn() != computerGame.getPlayerSide()) {
+                return;
+            }
+        }
+
         Square clickedSquare = getSquareFromMouseEvent(e);
 
         if (fromSquare == null) {
@@ -101,19 +109,24 @@ public class BoardPanel extends JPanel implements MouseListener {
                     clearHighlights();
                     highlightSquare(move.getFromSquare());
                     highlightSquare(move.getToSquare());
-                    historyPanel.updateHistory();
-
+                    if (game.isOver()) {
+                        return;
+                    };
                     // execute stockfish move if player has made a valid move
                     if (game instanceof ComputerGame computerGame
-                            && computerGame.getPlayerSide() != game.getCurrentTurn()) {
-                        SwingUtilities.invokeLater(() -> {
+                            && computerGame.getCurrentTurn() == computerGame.getComputerSide()) {
+                        computerGame.cancelCalculation();
+                        new Thread(() -> {
                             Move computerMove = computerGame.executeComputerMove();
-                            clearHighlights();
-                            highlightSquare(computerMove.getFromSquare());
-                            highlightSquare(computerMove.getToSquare());
-                            historyPanel.updateHistory();
-                            repaint();
-                        });
+                            if (computerMove != null) {
+                                SwingUtilities.invokeLater(() -> {
+                                    clearHighlights();
+                                    highlightSquare(computerMove.getFromSquare());
+                                    highlightSquare(computerMove.getToSquare());
+                                    repaint();
+                                });
+                            }
+                        }).start();
                     }
                 } else {
                     highlightedSquares.remove(fromSquare);
@@ -251,5 +264,18 @@ public class BoardPanel extends JPanel implements MouseListener {
 
     public int getSquareSize() {
         return squareSize;
+    }
+
+    // reset highlights to only the last move in history
+    public void resetHighlights() {
+        highlightedSquares.clear();
+        if (!game.getHistory().isEmpty()) {
+            highlightSquare(game.getHistory().getLastMove().getToSquare());
+            highlightSquare(game.getHistory().getLastMove().getFromSquare());
+        }
+    }
+
+    public void clearMoveHints() {
+        validToSquares.clear();
     }
 }

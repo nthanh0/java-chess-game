@@ -6,17 +6,14 @@ import ddt.chess.core.Square;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 
 public class PromotionPrompt extends JDialog {
 
     int squareSize;
-    PieceType result;
-    final Color defaultBackgroundColor = new Color(255, 255, 255, 125);
-    int hoveredOption = -1;
+    PieceType result = null;
+    final Color defaultBackgroundColor = new Color(255, 255, 255);
+    private AWTEventListener clickOutsideListener;
 
     public PromotionPrompt(BoardPanel boardPanel) {
         this.squareSize = boardPanel.getSquareSize();
@@ -24,6 +21,14 @@ public class PromotionPrompt extends JDialog {
         this.setFocusable(false);
         this.setBackground(defaultBackgroundColor);
         setLayout(new GridLayout(1, 4));
+
+        // esc to close dialog
+        this.getRootPane().registerKeyboardAction(
+                e -> dispose(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW
+        );
+
         JButton knightOption, bishopOption, rookOption, queenOption;
         if (boardPanel.getGame().getCurrentTurn() == PieceColor.WHITE) {
             knightOption = new JButton(new ImageIcon(boardPanel.getThemeLoader().getWhiteKnightImage()));
@@ -55,37 +60,37 @@ public class PromotionPrompt extends JDialog {
         });
 
 
-        setupButton(knightOption, 0);
-        setupButton(bishopOption, 1);
-        setupButton(rookOption, 2);
-        setupButton(queenOption, 3);
+        setupButton(knightOption);
+        setupButton(bishopOption);
+        setupButton(rookOption);
+        setupButton(queenOption);
 
         this.add(knightOption);
         this.add(bishopOption);
         this.add(rookOption);
         this.add(queenOption);
 
+        setupClickOutsideListener();
+
         this.setModal(true);
         this.pack();
         this.setLocationRelativeTo(boardPanel);
+        getRootPane().setBorder(BorderFactory.createLineBorder(Color.BLACK));
     }
 
-    public void setupButton(JButton button, int optionIndex) {
-        button.setOpaque(false);
+    public void setupButton(JButton button) {
         button.setFocusable(false);
-        button.setBorder(null);
         button.setBackground(defaultBackgroundColor);
+        button.setBorder(null);
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                hoveredOption = optionIndex;
-                repaint();
+                button.setBackground(new Color(0, 0,0, 50));
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                hoveredOption = -1;
-                repaint();
+                button.setBackground(defaultBackgroundColor);
             }
         });
     }
@@ -94,16 +99,40 @@ public class PromotionPrompt extends JDialog {
         return result;
     }
 
-    public void drawHoverEffect(Graphics2D g2D) {
-        g2D.setColor(new Color(0, 0, 0, 50));
-        g2D.fillRect(hoveredOption * squareSize, 0, squareSize, squareSize);
+    private void setupClickOutsideListener() {
+        clickOutsideListener = event -> {
+            if (event instanceof MouseEvent) {
+                MouseEvent mouseEvent = (MouseEvent) event;
+                // Check if the click is outside this dialog
+                if (mouseEvent.getID() == MouseEvent.MOUSE_PRESSED &&
+                        SwingUtilities.getWindowAncestor(mouseEvent.getComponent()) != this) {
+                    // Click was outside the dialog
+                    dispose();
+                }
+            }
+        };
+
+        // Add global listener when dialog becomes visible
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent e) {
+                Toolkit.getDefaultToolkit().addAWTEventListener(
+                        clickOutsideListener, AWTEvent.MOUSE_EVENT_MASK);
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+                // Remove listener when dialog closes
+                Toolkit.getDefaultToolkit().removeAWTEventListener(clickOutsideListener);
+            }
+        });
+
+        // Add escape key to close dialog
+        this.getRootPane().registerKeyboardAction(
+                e -> dispose(),  // Close dialog without setting result
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW
+        );
     }
 
-
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-        Graphics2D g2D = (Graphics2D) g;
-        drawHoverEffect(g2D);
-    }
 }

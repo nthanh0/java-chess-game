@@ -7,7 +7,10 @@ import ddt.chess.util.TimerClock;
 public class ComputerGame extends Game {
     PieceColor playerSide;
     String stockfishPath = "resources/stockfish/stockfish-ubuntu-x86-64-avx2";
+
     Stockfish stockfish;
+    private Thread stockfishThread = null;
+    private volatile boolean calculationCanceled = false;
 
     public ComputerGame(PieceColor playerSide, int computerElo) {
         super();
@@ -17,25 +20,57 @@ public class ComputerGame extends Game {
         stockfish.setEloLevel(computerElo);
     }
 
-    // time format is hh:mm:ss
-    public ComputerGame(PieceColor playerSide, String time, int computerElo) {
-        super(time);
+    public ComputerGame(int computerElo) {
+        super();
+        this.playerSide = PieceColor.WHITE;
+        stockfish = new Stockfish();
+        stockfish.startEngine(stockfishPath);
+        stockfish.setEloLevel(computerElo);
+    }
+
+    public ComputerGame(PieceColor playerSide, double timeMinutes, int computerElo) {
+        super(timeMinutes);
         this.playerSide = playerSide;
         stockfish = new Stockfish();
         stockfish.startEngine(stockfishPath);
         stockfish.setEloLevel(computerElo);
     }
 
+    public ComputerGame(double timeMinutes, int computerElo) {
+        super(timeMinutes);
+        this.playerSide = PieceColor.WHITE;
+        stockfish = new Stockfish();
+        stockfish.startEngine(stockfishPath);
+        stockfish.setEloLevel(computerElo);
+    }
+
     public Move executeComputerMove() {
-        int waitTime;
+        stockfishThread = Thread.currentThread();
+        calculationCanceled = false;
+
         String fen = Notation.gameToFEN(this);
         String bestMoveString;
         if (isTimedGame()) {
             bestMoveString = stockfish.getBestMoveWithTimeManagement(fen, getWhiteClock().getRemainingTimeMillis(), getBlackClock().getRemainingTimeMillis());
         } else {
-            bestMoveString = stockfish.getBestMove(Notation.gameToFEN(this), 3000);
+            bestMoveString = stockfish.getBestMoveWithSimulatedTime(fen, 600000); // 10 mins
         }
+
+        if (calculationCanceled || Thread.currentThread().isInterrupted()) {
+            return null;
+        }
+
+        if (bestMoveString == null) {
+            System.out.println("BEST MOVE STRING IS NULL");
+            return null;
+        }
+
         Move computerMove = Notation.stockfishOutputToMove(getBoard(), bestMoveString);
+
+        if (getCurrentTurn() != getComputerSide()) {
+            System.out.print("NOT COMPUTER'S TURN");
+            return null;
+        }
         if (bestMoveString.length() == 5) {
             PieceType promoteTo = Notation.getPieceTypeFromLetter(bestMoveString.charAt(4));
             getBoard().promotePawn(computerMove, promoteTo);
@@ -45,14 +80,29 @@ public class ComputerGame extends Game {
             }
             updateHalfMoves(computerMove);
             switchTurns();
+            checkIfGameIsOver();
+            if (getOnMoveMade() != null) {
+                getOnMoveMade().run();
+            }
         } else {
             makeMove(computerMove);
         }
+        stockfishThread = null;
         return computerMove;
     }
 
     public TimerClock getComputerClock() {
         return (playerSide == PieceColor.WHITE) ? getBlackClock() : getWhiteClock();
+    }
+
+    public void undoLastMove() {
+        cancelCalculation();
+        if (getCurrentTurn() == getPlayerSide()) {
+            super.undoLastMove();
+            super.undoLastMove();
+        } else {
+            super.undoLastMove();
+        }
     }
 
     public TimerClock getPlayerClock() {
@@ -63,4 +113,25 @@ public class ComputerGame extends Game {
         return playerSide;
     }
 
+    public PieceColor getComputerSide() {
+        return (playerSide == PieceColor.WHITE) ? PieceColor.BLACK : PieceColor.WHITE;
+    }
+
+    public int getComputerElo() {
+        return stockfish.getElo();
+    }
+
+    public void cancelCalculation() {
+        calculationCanceled = true;
+        stockfish.stopCalculation();
+        if (stockfishThread != null && stockfishThread.isAlive()) {
+            stockfishThread.interrupt();
+            // Give a moment for the interruption to take effect
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                System.out.println("COMPUTER CALCULATION CANCELED");
+            }
+        }
+    }
 }

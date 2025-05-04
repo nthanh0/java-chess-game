@@ -145,6 +145,15 @@ public class Notation {
             char promotedToPieceLetter = move.getToSquare().getPiece().getType().getPieceLetter();
             res.append('=').append(Character.toUpperCase(promotedToPieceLetter));
         }
+        // check
+        PieceColor opponentSide = (move.getMovingPiece().isWhite()) ? PieceColor.BLACK : PieceColor.WHITE;
+        if (board.isCheck(opponentSide)) {
+            if (board.generateAllValidNormalMoves(opponentSide).isEmpty()) {
+                res.append('#');
+            } else {
+                res.append('+');
+            }
+        }
         return res.toString();
     }
 
@@ -205,6 +214,14 @@ public class Notation {
         if (MoveValidator.isValidPromotion(move)) {
             char promotedToPieceLetter = move.getToSquare().getPiece().getType().getPieceLetter();
             res.append('=').append(Character.toUpperCase(promotedToPieceLetter));
+        }
+        PieceColor opponentSide = (move.getMovingPiece().isWhite()) ? PieceColor.BLACK : PieceColor.WHITE;
+        if (board.isCheck(opponentSide)) {
+            if (board.generateAllValidNormalMoves(opponentSide).isEmpty()) {
+                res.append('#');
+            } else {
+                res.append('+');
+            }
         }
         return res.toString();
     }
@@ -287,5 +304,28 @@ public class Notation {
     }
 
 
+    public static String gameToPGN(Game game) {
+        String res = "";
+        res += "[Event \"Chess game\"]\n";
+        res += "[Round \"-\"]\n";
+        if (game instanceof ComputerGame computerGame) {
+            res += "[White \"Player\"]\n";
+            res += "[Black \"Computer\"]\n";
+            res += String.format("[BlackElo \"%d\"]\n", computerGame.getComputerElo());
+        }
+        String gameResult = "";
+        if (game.isOver()) {
+            if (game.getWinner() == "white") {
+                gameResult = "1-0";
+            } else if (game.getWinner() == "black") {
+                gameResult = "0-1";
+            } else if (game.getWinner() == "none") {
+                gameResult = "1/2-1/2";
+            }
+            res += String.format("[Result \"%s\"]\n", gameResult);
+        }
 
+        res += game.getHistory().getHistoryString() + gameResult;
+        return res;
+    }
 }

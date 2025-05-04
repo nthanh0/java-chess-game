@@ -22,7 +22,7 @@ public class TerminalUI {
     }
 
     public void run() {
-        game = new Game() {
+        game = new Game(1) {
             @Override
             public PieceType askForPromotion() {
                 return TerminalUI.askForPromotion();
@@ -33,33 +33,21 @@ public class TerminalUI {
         }
         TimerClock whiteClock = game.getWhiteClock();
         TimerClock blackClock = game.getBlackClock();
-        Thread whiteClockThread = new Thread(whiteClock);
-        Thread blackClockThread = new Thread(blackClock);
+
         Board board = game.getBoard();
         MoveHistory history = game.getHistory();
 
         label:
-        while (!game.isOver()) {
+        while (!game.checkIfGameIsOver()) {
             printAllValidMoves(board, game.getCurrentTurn(), history);
             if (game.isTimedGame()) {
-                printTime();
-                if (history.getSize() == 1) {
-                    whiteClockThread.start();
-                    blackClockThread.start();
-                }
+                printTime(game);
                 if (whiteClock.isFinished()) {
                     System.out.println("White ran out of time. Black wins!");
                     break;
                 } else if (blackClock.isFinished()) {
                     System.out.println("Black ran out of time. White wins!");
                     break;
-                }
-                if (game.getCurrentTurn() == PieceColor.WHITE) {
-                    blackClock.pause();
-                    whiteClock.resume();
-                } else {
-                    whiteClock.pause();
-                    blackClock.resume();
                 }
             }
             printHistory(board, history);
@@ -83,6 +71,7 @@ public class TerminalUI {
                     continue;
                 case "quit":
                 case "exit":
+                    System.out.println(game.getHistory().getRawString());
                     System.out.println("Game terminated by user.");
                     break label;
             }
@@ -165,7 +154,7 @@ public class TerminalUI {
         catch (LineUnavailableException e) {
             System.out.println("Unable to access audio resource");
         }
-        System.out.println(game.isOver() ? game.getWinner() : "Game terminated early.");
+        System.out.println(game.checkIfGameIsOver() ? game.getWinner() : "Game terminated early.");
     }
 
     static public void printBoard(Board board) {
@@ -188,10 +177,10 @@ public class TerminalUI {
     }
 
     public void printHistory(Board board, MoveHistory history) {
-        System.out.println("History: " + history.getUnicodeString());
+        System.out.println("History: " + history.getHistoryString());
     }
 
-    public void printTime() {
+    public void printTime(Game game) {
         System.out.print("White time left: ");
         System.out.println(game.getWhiteClock().getTimeLeftString());
         System.out.print("Black time left: ");

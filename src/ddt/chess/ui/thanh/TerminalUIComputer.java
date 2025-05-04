@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class TerminalUIComputer {
-    ComputerGame game = new ComputerGame(PieceColor.WHITE, 2000);
+    ComputerGame game = new ComputerGame(PieceColor.WHITE, 0.25, 2000);
     Board board = game.getBoard();
     Scanner scanner = new Scanner(System.in);
     public TerminalUIComputer() {
-        while (!game.isOver()) {
-//            printHistory(board, game.getHistory());
+        while (!game.checkIfGameIsOver()) {
             printBoard(board);
+            printTime(game);
             if (game.getCurrentTurn() == game.getPlayerSide()) {
                 System.out.print("Enter starting square: ");
                 String startString = scanner.nextLine().toLowerCase().trim();
@@ -95,5 +95,11 @@ public class TerminalUIComputer {
             System.out.print(Notation.moveToAlgebraicNotation(board, move) + " ");
         }
         System.out.println();
+    }
+    public void printTime(Game game) {
+        System.out.print("White time left: ");
+        System.out.println(game.getWhiteClock().getTimeLeftString());
+        System.out.print("Black time left: ");
+        System.out.println(game.getBlackClock().getTimeLeftString());
     }
 }
