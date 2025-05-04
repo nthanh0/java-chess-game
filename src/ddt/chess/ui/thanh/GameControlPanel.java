@@ -50,9 +50,7 @@ public class GameControlPanel extends JPanel {
         resignButton.setToolTipText("Resign");
         resignButton.addActionListener(e -> {
             if (game instanceof ComputerGame computerGame) {
-                if (computerGame.getCurrentTurn() == computerGame.getComputerSide()) {
-                    game.resign(computerGame.getPlayerSide());
-                }
+                game.resign(computerGame.getPlayerSide());
             } else {
                 game.resign(game.getCurrentTurn());
             }

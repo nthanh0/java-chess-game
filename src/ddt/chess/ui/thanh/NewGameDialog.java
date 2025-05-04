@@ -32,10 +32,12 @@ public class NewGameDialog extends JDialog {
             105, 120, 135, 150, 165, 180
     };
 
-    String[] difficulties = {"easy", "medium", "hard", "grandmaster"};
-    int[] correspondingElo = {1320, 1600, 2000, 2500};
+    String[] difficulties = {"easy", "medium", "hard", "grandmaster", "super grandmaster"};
+    int[] correspondingElo = {1320, 1600, 2000, 2500, 2800};
 
     private boolean confirmed = false;
+
+    Font font;
 
     public NewGameDialog() {
         initComponents();
@@ -47,22 +49,62 @@ public class NewGameDialog extends JDialog {
     public NewGameDialog(int squareSize) {
         this();
         this.squareSize = squareSize;
-        int width = squareSize * 4;
-        int height = squareSize * 6;
+
+        // Calculate a reasonable dialog size based on the square size
+        int width = squareSize * 5;
+        int height = squareSize * 5;
         setSize(width, height);
         setLocationRelativeTo(null);
+
+        // Create a larger font but don't go too extreme
+        font = new Font("Arial", Font.PLAIN, squareSize / 6);
+
+        // Apply font to all components
+        setUIFont(font);
+    }
+
+    // This helper method sets the default font for all Swing components
+    private void setUIFont(Font font) {
+        // Set default font
+        UIManager.put("Button.font", font);
+        UIManager.put("ToggleButton.font", font);
+        UIManager.put("RadioButton.font", font);
+        UIManager.put("CheckBox.font", font);
+        UIManager.put("ComboBox.font", font);
+        UIManager.put("Label.font", font);
+        UIManager.put("List.font", font);
+        UIManager.put("TextField.font", font);
+        UIManager.put("Panel.font", font);
+        UIManager.put("ScrollPane.font", font);
+        UIManager.put("TitledBorder.font", font);
+        UIManager.put("ComboBox.font", font);
+
+        // Manually apply font to existing components
+        isTimedGameCheckBox.setFont(font);
+        isComputerGameCheckBox.setFont(font);
+        allowUndoCheckBox.setFont(font);
+        difficultyComboBox.setFont(font);
+        timeValueLabel.setFont(font);
+        okButton.setFont(font);
+        cancelButton.setFont(font);
+
+        // Update UI to reflect changes
+        SwingUtilities.updateComponentTreeUI(this);
     }
 
     private void initComponents() {
         setTitle("New Game");
         setModal(true);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        getContentPane().setBackground(new Color(70, 70, 70));
-        getContentPane().setForeground(Color.WHITE);
 
         isTimedGameCheckBox = new JCheckBox("Timed Game");
+        isTimedGameCheckBox.setFocusPainted(false);
+
         isComputerGameCheckBox = new JCheckBox("Play Against Computer");
+        isComputerGameCheckBox.setFocusPainted(false);
+
         allowUndoCheckBox = new JCheckBox("Allow Undo");
+        allowUndoCheckBox.setFocusPainted(false);
 
         timeSlider = new JSlider(0, timeValues.length - 1);
         timeSlider.setPaintTicks(true);
@@ -74,52 +116,63 @@ public class NewGameDialog extends JDialog {
         difficultyComboBox = new JComboBox<>(difficulties);
 
         okButton = new JButton("OK");
-        cancelButton = new JButton("Cancel");
+        okButton.setFocusPainted(false);
+        okButton.setPreferredSize(new Dimension(100, 40));
 
+        cancelButton = new JButton("Cancel");
+        cancelButton.setFocusPainted(false);
+        cancelButton.setPreferredSize(new Dimension(100, 40));
     }
 
     private void setupLayout() {
-        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        // Create main panel with good spacing
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JPanel settingsPanel = new JPanel();
-        settingsPanel.setLayout(new BoxLayout(settingsPanel, BoxLayout.Y_AXIS));
+        // Computer game panel
+        JPanel computerPanel = new JPanel(new BorderLayout(10, 10));
+        computerPanel.add(isComputerGameCheckBox, BorderLayout.NORTH);
 
-        JPanel gameTypePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        gameTypePanel.add(isComputerGameCheckBox);
-
-        JPanel difficultyPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        difficultyPanel.add(new JLabel("Computer Difficulty:"));
+        JPanel difficultyPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        JLabel difficultyLabel = new JLabel("Computer Difficulty:");
+        difficultyPanel.add(difficultyLabel);
         difficultyPanel.add(difficultyComboBox);
+        computerPanel.add(difficultyPanel, BorderLayout.CENTER);
 
-        JPanel timePanel = new JPanel();
-        timePanel.setLayout(new GridLayout(4, 1));
+        // Timed game panel
+        JPanel timedGamePanel = new JPanel();
+        timedGamePanel.setLayout(new BorderLayout(10, 10));
+        timedGamePanel.add(isTimedGameCheckBox, BorderLayout.NORTH);
 
-        timePanel.add(isTimedGameCheckBox);
+        JPanel timeSliderPanel = new JPanel(new BorderLayout(5, 5));
+        JLabel timeLabel = new JLabel("Time (minutes):");
+        timeSliderPanel.add(timeLabel, BorderLayout.NORTH);
+        timeSliderPanel.add(timeSlider, BorderLayout.CENTER);
+        timeSliderPanel.add(timeValueLabel, BorderLayout.SOUTH);
 
-        timePanel.add(new JLabel("Time (minutes): "));
-        timePanel.add(timeSlider);
-        timePanel.add(timeValueLabel);
+        timedGamePanel.add(timeSliderPanel, BorderLayout.CENTER);
 
+        // Undo panel
         JPanel undoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         undoPanel.add(allowUndoCheckBox);
 
-        settingsPanel.add(gameTypePanel);
-        settingsPanel.add(difficultyPanel);
-        settingsPanel.add(Box.createVerticalStrut(10));
-        settingsPanel.add(timePanel);
-        settingsPanel.add(Box.createVerticalStrut(10));
-        settingsPanel.add(undoPanel);
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.add(okButton);
+        // Button panel
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         buttonPanel.add(cancelButton);
+        buttonPanel.add(okButton);
 
-        mainPanel.add(settingsPanel, BorderLayout.CENTER);
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        // Add vertical spacing between sections
+        mainPanel.add(computerPanel);
+        mainPanel.add(Box.createVerticalStrut(20));
+        mainPanel.add(timedGamePanel);
+        mainPanel.add(Box.createVerticalStrut(20));
+        mainPanel.add(undoPanel);
+        mainPanel.add(Box.createVerticalStrut(20));
+        mainPanel.add(buttonPanel);
 
         setContentPane(mainPanel);
-        pack();
     }
 
     private void setupListeners() {
@@ -248,18 +301,4 @@ public class NewGameDialog extends JDialog {
         dialog.setVisible(true);
         return dialog;
     }
-
-    public void setupCheckBox(JCheckBox checkBox) {
-        checkBox.setPreferredSize(new Dimension(squareSize / 10, squareSize / 10));
-    }
-
-    private void setFont(Component comp, Font font) {
-        comp.setFont(font);
-        if (comp instanceof Container) {
-            for (Component child : ((Container) comp).getComponents()) {
-                setFont(child, font);
-            }
-        }
-    }
-
 }

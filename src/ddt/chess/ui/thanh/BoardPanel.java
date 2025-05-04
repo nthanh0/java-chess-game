@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -179,6 +180,35 @@ public class BoardPanel extends JPanel implements MouseListener {
         }
     }
 
+    public void drawCoordinates(Graphics2D g2D) {
+        BufferedImage boardImage = theme.getBoardImage();
+        int lightSquareRgb = boardImage.getRGB(0, 0);
+        int darkSquareRgb = boardImage.getRGB(0, squareSize + 1);
+        Color lightSquareColor = new Color(lightSquareRgb);
+        Color darkSquareColor = new Color(darkSquareRgb);
+        g2D.setFont(new Font("Arial", Font.PLAIN, squareSize / 5));
+        g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        FontMetrics metrics = g2D.getFontMetrics();
+        int ascent = metrics.getAscent();
+        int descent = metrics.getDescent();
+        for (int i = 0; i < 8; i++) {
+            if (i % 2 == 0) {
+                g2D.setColor(darkSquareColor);
+            } else {
+                g2D.setColor(lightSquareColor);
+            }
+            g2D.drawString(String.format("%d", i + 1), squareSize / 16, i * squareSize + ascent);
+        }
+        for (int i = 0; i < 8; i++) {
+            if (i % 2 == 1) {
+                g2D.setColor(darkSquareColor);
+            } else {
+                g2D.setColor(lightSquareColor);
+            }
+            g2D.drawString(String.format("%c", i + 97), i * squareSize + 5 * squareSize / 6, squareSize * 8 - descent);
+        }
+    }
+
     public void generateValidToSquares(Square fromSquare) {
         ArrayList<Move> validMoves = board.generateAllValidMoves(game.getCurrentTurn(), game.getHistory());
         for (Move move : validMoves) {
@@ -229,6 +259,7 @@ public class BoardPanel extends JPanel implements MouseListener {
         Graphics2D g2D = (Graphics2D)g;
         // draw board image
         drawBoard(g2D);
+        drawCoordinates(g2D);
         // draw square highlights
         if (board.isCheck(game.getCurrentTurn())) {
             highlightedSquares.put(board.findKingSquare(game.getCurrentTurn()), new Color(255, 100, 100, 64));

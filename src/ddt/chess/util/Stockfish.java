@@ -12,9 +12,9 @@ public class Stockfish {
     private boolean isReady = false;
     private Map<String, String> positionCache = new HashMap<>();
     private boolean useHash = true;
-    private int hashSizeMB = 256; // Default hash size
+    private int hashSizeMB = 256; //
     private int elo = 1320;
-    private int threads = Runtime.getRuntime().availableProcessors(); // Use all available cores by default
+    private int threads = Runtime.getRuntime().availableProcessors();
 
     public boolean startEngine(String path) {
         try {
@@ -22,10 +22,8 @@ public class Stockfish {
             processReader = new BufferedReader(new InputStreamReader(engineProcess.getInputStream()));
             processWriter = new BufferedWriter(new OutputStreamWriter(engineProcess.getOutputStream()));
 
-            // initialize engine
             isReady = sendCommand("uci") && waitFor("uciok");
 
-            // Apply performance optimizations
             if (isReady) {
                 optimizeEngine();
             }
@@ -84,14 +82,14 @@ public class Stockfish {
     public String getOutput(long waitTime) {
         StringBuilder sb = new StringBuilder();
         try {
-            // Wait for initial time
+            // wait for initial time
             Thread.sleep(Math.min(waitTime, 100));
 
-            // Start time measurement
+            // start time measurement
             long startTime = System.currentTimeMillis();
             long endTime = startTime + waitTime;
 
-            // Keep reading until timeout or no more data
+            // keep reading until timeout or no more data
             while (System.currentTimeMillis() < endTime) {
                 if (processReader.ready()) {
                     String line = processReader.readLine();
@@ -177,7 +175,7 @@ public class Stockfish {
         // maximum wait time
         boolean isWhiteTurn = fen.contains(" w ");
         long availableTime = isWhiteTurn ? whiteTimeMs : blackTimeMs;
-        long maxWaitTime = Math.min(availableTime / 10, 10000); // max 10 seconds
+        long maxWaitTime = Math.min(availableTime / 10, 15000); // max 30 seconds
 
         // Get output with timeout
         String output = getOutput(maxWaitTime);
@@ -231,10 +229,6 @@ public class Stockfish {
         }
     }
 
-    /**
-     * Enable or disable position caching
-     * @param useCache True to enable caching
-     */
     public void setUseCache(boolean useCache) {
         this.useHash = useCache;
         if (!useCache) {
