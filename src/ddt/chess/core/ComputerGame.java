@@ -80,10 +80,10 @@ public class ComputerGame extends Game {
             }
             updateHalfMoves(computerMove);
             switchTurns();
-            checkIfGameIsOver();
             if (getOnMoveMade() != null) {
                 getOnMoveMade().run();
             }
+            checkIfGameIsOver();
         } else {
             makeMove(computerMove);
         }

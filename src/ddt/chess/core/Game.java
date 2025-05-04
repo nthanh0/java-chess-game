@@ -79,6 +79,11 @@ public class Game {
                     history.undoLastMove();
                     return false;
                 }
+                // switch turns
+                switchTurns();
+                if (onMoveMade != null) {
+                    onMoveMade.run();
+                }
                 // set hasMoved to true
                 move.getMovingPiece().setHasMoved(true);
             } else {
@@ -97,13 +102,8 @@ public class Game {
             }
             // update half move count, reset if moving piece is a pawn or a capture, else increment
             updateHalfMoves(move);
-            // switch turns
-            switchTurns();
             // is valid move
             checkIfGameIsOver();
-            if (onMoveMade != null) {
-                onMoveMade.run();
-            }
             return true;
         }
         // if wrong turn then is invalid move

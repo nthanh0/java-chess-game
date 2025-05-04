@@ -68,23 +68,20 @@ public class ChessGameGUI extends JFrame {
         soundPlayer = new SoundPlayer();
 
         game.setOnMoveMade(() -> {
-            sidePanel.getBlackInfoPanel().updateComputerThinking(); // no idea why i have to
-                                                                    // add this to both listeners
+            boardPanel.repaint();
+            sidePanel.getBlackInfoPanel().updateComputerThinking();
             soundPlayer.playMoveSound(game);
         });
 
         game.getHistory().setOnUpdate(() -> {
             boardPanel.resetHighlights();
-            boardPanel.clearMoveHints();
             boardPanel.repaint();
             sidePanel.getHistoryScrollPane().refresh();
-            sidePanel.getBlackInfoPanel().updateComputerThinking();
         });
 
         game.setOnGameEnd(() -> {
             sidePanel.hideGameControlPanel();
             sidePanel.getGameOverPanel().update();
-            boardPanel.clearMoveHints();
             soundPlayer.playGameEndSound();
         });
 
