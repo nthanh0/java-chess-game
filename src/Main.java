@@ -1,5 +1,5 @@
-import ddt.chess.ui.ChessGameGUI;
-import ddt.chess.ui.NewGameDialog;
+import chess.ui.ChessGameGUI;
+import chess.ui.NewGameDialog;
 
 import java.awt.*;
 
