@@ -1,11 +1,10 @@
-package ddt.chess.ui.thanh;
+package ddt.chess.ui;
 
 import ddt.chess.core.ComputerGame;
 import ddt.chess.core.Game;
 import ddt.chess.core.PieceColor;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import java.awt.*;

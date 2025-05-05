@@ -1,9 +1,8 @@
-package ddt.chess.ui.thanh;
+package ddt.chess.ui;
 
 import ddt.chess.util.TimerClock;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class TimePanel extends JPanel {

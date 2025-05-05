@@ -1,8 +1,7 @@
-package ddt.chess.ui.thanh;
+package ddt.chess.ui;
 
 import ddt.chess.core.Game;
 import ddt.chess.core.MoveHistory;
-import ddt.chess.core.Square;
 
 import javax.swing.*;
 import java.awt.*;

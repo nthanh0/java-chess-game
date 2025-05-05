@@ -1,11 +1,10 @@
-package ddt.chess.ui.thanh;
+package ddt.chess.ui;
 
 import ddt.chess.core.MoveHistory;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
-import javax.swing.plaf.basic.BasicScrollBarUI;
 import java.awt.*;
 
 public class HistoryScrollPane extends JScrollPane {

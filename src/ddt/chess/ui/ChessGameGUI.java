@@ -1,4 +1,4 @@
-package ddt.chess.ui.thanh;
+package ddt.chess.ui;
 
 import ddt.chess.core.*;
 import ddt.chess.util.SoundPlayer;

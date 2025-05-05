@@ -1,6 +1,4 @@
-package ddt.chess.ui.thanh;
-
-import ddt.chess.core.Game;
+package ddt.chess.ui;
 
 public class GameSettings {
     public boolean isTimedGame;

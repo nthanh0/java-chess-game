@@ -14,7 +14,7 @@ public class Stockfish {
     private boolean useHash = true;
     private int hashSizeMB = 256; //
     private int elo = 1320;
-    private int threads = Runtime.getRuntime().availableProcessors();
+    private int threads = Runtime.getRuntime().availableProcessors() - 1;
 
     public boolean startEngine(String path) {
         try {

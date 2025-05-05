@@ -1,4 +1,4 @@
-package ddt.chess.ui.thanh;
+package ddt.chess.ui;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;

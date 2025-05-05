@@ -1,8 +1,7 @@
-package ddt.chess.ui.thanh;
+package ddt.chess.ui;
 
 import ddt.chess.core.PieceColor;
 import ddt.chess.core.PieceType;
-import ddt.chess.core.Square;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,4 +1,4 @@
-package ddt.chess.ui.thanh;
+package ddt.chess.util;
 
 import ddt.chess.core.Piece;
 

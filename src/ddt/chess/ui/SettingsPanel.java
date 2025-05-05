@@ -1,10 +1,11 @@
-package ddt.chess.ui.thanh;
+package ddt.chess.ui;
+
+import ddt.chess.util.ThemeLoader;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.MatteBorder;
-import javax.swing.plaf.basic.BasicScrollBarUI;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
