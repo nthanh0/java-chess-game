@@ -76,7 +76,9 @@ public class ComputerGame extends Game {
             return null;
         }
         if (bestMoveString.length() == 5) {
+            computerMove.setMoveType(MoveType.PROMOTION);
             PieceType promoteTo = Notation.getPieceTypeFromLetter(bestMoveString.charAt(4));
+            computerMove.setPromotionPieceType(promoteTo);
             getBoard().promotePawn(computerMove, promoteTo);
             getHistory().addMove(getBoard(), computerMove);
             if (isTimedGame()) {

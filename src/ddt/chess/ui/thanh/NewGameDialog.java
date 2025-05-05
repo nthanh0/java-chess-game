@@ -125,22 +125,19 @@ public class NewGameDialog extends JDialog {
     }
 
     private void setupLayout() {
-        // Create main panel with good spacing
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Computer game panel
         JPanel computerPanel = new JPanel(new BorderLayout(10, 10));
         computerPanel.add(isComputerGameCheckBox, BorderLayout.NORTH);
 
         JPanel difficultyPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
-        JLabel difficultyLabel = new JLabel("Computer Difficulty:");
+            JLabel difficultyLabel = new JLabel("Computer Difficulty:");
         difficultyPanel.add(difficultyLabel);
         difficultyPanel.add(difficultyComboBox);
         computerPanel.add(difficultyPanel, BorderLayout.CENTER);
 
-        // Timed game panel
         JPanel timedGamePanel = new JPanel();
         timedGamePanel.setLayout(new BorderLayout(10, 10));
         timedGamePanel.add(isTimedGameCheckBox, BorderLayout.NORTH);
@@ -153,17 +150,14 @@ public class NewGameDialog extends JDialog {
 
         timedGamePanel.add(timeSliderPanel, BorderLayout.CENTER);
 
-        // Undo panel
         JPanel undoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         undoPanel.add(allowUndoCheckBox);
 
-        // Button panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         buttonPanel.add(cancelButton);
         buttonPanel.add(okButton);
 
-        // Add vertical spacing between sections
         mainPanel.add(computerPanel);
         mainPanel.add(Box.createVerticalStrut(20));
         mainPanel.add(timedGamePanel);

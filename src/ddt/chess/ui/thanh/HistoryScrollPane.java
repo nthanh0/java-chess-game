@@ -38,7 +38,7 @@ public class HistoryScrollPane extends JScrollPane {
     }
 
     public void refresh() {
-        historyTextArea.setText(history.getUnicodeString());
+        historyTextArea.setText(history.getHistoryString());
     }
 
     public void setSquareSize(int squareSize) {

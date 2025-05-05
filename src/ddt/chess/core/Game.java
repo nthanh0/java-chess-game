@@ -116,6 +116,11 @@ public class Game {
             move.setMoveType(MoveType.CASTLING);
         } else if (MoveValidator.isValidPromotion(move)) {
             move.setMoveType(MoveType.PROMOTION);
+            PieceType promoteTo = askForPromotion();
+            move.setPromotionPieceType(promoteTo);
+            if (promoteTo == null) {
+                return;
+            }
         } else if (MoveValidator.isValidEnPassant(board, move, history)) {
             move.setMoveType(MoveType.EN_PASSANT);
         } else {
@@ -133,11 +138,7 @@ public class Game {
                 board.performCastling(move);
             }
             case PROMOTION -> {
-                PieceType promoteTo = askForPromotion();
-                board.promotePawn(move, promoteTo);
-                if (promoteTo == null) {
-                    return false;
-                }
+                board.promotePawn(move, move.getPromotionPieceType());
             }
             case EN_PASSANT -> {
                 board.performEnPassant(move);

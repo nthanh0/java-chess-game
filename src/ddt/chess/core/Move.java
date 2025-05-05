@@ -9,6 +9,8 @@ public class Move {
     private MoveType moveType;
     private final boolean isFirstMoveOfPiece;
 
+    private PieceType promotionPieceType;
+
     public Move(Square fromSquare, Square toSquare) {
         this.fromSquare = fromSquare;
         this.toSquare = toSquare;
@@ -46,4 +48,13 @@ public class Move {
     public boolean isFirstMoveOfPiece() {
         return isFirstMoveOfPiece;
     }
+
+    public void setPromotionPieceType(PieceType promotionPieceType) {
+        this.promotionPieceType = promotionPieceType;
+    }
+
+    public PieceType getPromotionPieceType() {
+        return promotionPieceType;
+    }
+
 }

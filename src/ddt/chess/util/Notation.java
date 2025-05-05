@@ -163,7 +163,7 @@ public class Notation {
 
         // check for promotion
         if (MoveValidator.isValidPromotion(move)) {
-            char promotedToPieceLetter = move.getToSquare().getPiece().getType().getPieceLetter();
+            char promotedToPieceLetter = move.getPromotionPieceType().getPieceLetter();
             res.append('=').append(Character.toUpperCase(promotedToPieceLetter));
         }
 
